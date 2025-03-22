@@ -50,16 +50,36 @@ function Success() {
     <>
       <div
         style={{
-          height: "80vh",
+          height: "60vh",
           display: "flex",
-          alignItems: "center",
+          alignItems: "center", // This centers vertically in the container
+          justifyContent: "center", // This centers horizontally
+          textAlign: "center",
         }}
       >
-        <h1>Success! Project created 🥳</h1>
+        <h1
+          style={{
+            fontFamily: "Roboto, Arial, sans-serif",
+          }}
+        >
+          Success! Project created 🥳
+        </h1>
       </div>
-      <div>
-        <button onClick={handleChange}>Return Home</button>
-      </div>
+
+      <Button
+        variant="outlined"
+        onClick={handleChange}
+        sx={{
+          borderColor: "black",
+          color: "black",
+          "&:hover": {
+            backgroundColor: "#f0f0f0",
+            borderColor: "black",
+          },
+        }}
+      >
+        Return Home
+      </Button>
     </>
   );
 }
@@ -100,7 +120,38 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
     isPrivate: "",
   });
 
-  const project_details = response | {};
+  const api = axios.create({
+    baseURL: "https://ricoai1-526454760b6c.herokuapp.com",
+  });
+
+  const projectData = response;
+
+  const handleConfirm = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    try {
+      const reply = await api.post("/create-repo", {
+        repo_name: tempAnswers.repoName,
+        repo_description: tempAnswers.repoDescription,
+        private: tempAnswers.repoPrivacy,
+        token: tempAnswers.PAT,
+        project_data: projectData,
+      });
+
+      setConfirmed(true);
+      //setLoading(false);
+      console.log(reply);
+      // setConfirmed(true);
+      setAnswers(tempAnswers); // make sure tempAnswers is defined
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("❌ Axios Error:", error.message);
+        console.log("Response:", error.response);
+      } else {
+        console.error("❌ Unknown Error:", error);
+      }
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -132,6 +183,7 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
             borderRadius: 2,
             boxShadow: 2,
             fontFamily: "Roboto, Arial, sans-serif",
+            marginBottom: "50px",
           }}
         >
           <h3
@@ -174,7 +226,8 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
                 <ul style={{ textAlign: "left" }}>
                   {milestone.issues.map((issue, idx) => (
                     <li key={idx} style={{ padding: "5px" }}>
-                      <strong>{issue.title}:</strong> {issue.description}
+                      <strong>{issue.title}:</strong>{" "}
+                      {parseDescriptionToList(issue.description)}
                     </li>
                   ))}
                 </ul>
@@ -193,6 +246,15 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
             boxShadow: 2,
           }}
         >
+          <h2
+            style={{
+              fontFamily: "Roboto, Arial, sans-serif",
+              textAlign: "left",
+            }}
+          >
+            If you are happy with the project details, fill up the details below
+            and press "Confirm". If not, press "Edit".
+          </h2>
           <Typography variant="body1" mt={2} align="left">
             Q1: Enter a repository name
           </Typography>
@@ -280,7 +342,7 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
           <Button
             variant="contained"
             disabled={!isFormComplete}
-            onClick={handleGoToSuccess}
+            onClick={handleConfirm}
             sx={{
               backgroundColor: "black",
               color: "white",

@@ -13,9 +13,12 @@ export default function Success() {
           height: "80vh",
           display: "flex",
           alignItems: "center",
+          fontFamily: "Roboto, Arial, sans-serif",
         }}
       >
-        <h1>Success! Project created 🥳</h1>
+        <h1 style={{ fontFamily: "Roboto, Arial, sans-serif" }}>
+          Success! Project created 🥳
+        </h1>
       </div>
       <div>
         <button onClick={handleChange}>Return Home</button>
