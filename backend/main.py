@@ -23,8 +23,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
     allow_credentials=False,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
-    allow_headers=["Content-Type"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allow_headers=["*"],
 )
 
 db = mongo_client[os.getenv('DB_NAME')]

@@ -91,10 +91,6 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
     return steps.map((step, index) => <li key={index}>{step}</li>);
   };
 
-  const handleGoToSuccess = () => {
-    setConfirmed(true);
-  };
-
   const handleGoToForm = () => {
     setSubmitted(false);
   };
@@ -119,6 +115,7 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
     PAT: "",
     isPrivate: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const api = axios.create({
     baseURL: "https://ricoai1-526454760b6c.herokuapp.com",
@@ -138,11 +135,10 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
         project_data: projectData,
       });
 
-      setConfirmed(true);
-      //setLoading(false);
-      console.log(reply);
-      // setConfirmed(true);
       setAnswers(tempAnswers); // make sure tempAnswers is defined
+      setConfirmed(true);
+      setLoading(false);
+      console.log(reply);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("❌ Axios Error:", error.message);
@@ -159,6 +155,7 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
       ...prev,
       [name]: name === "isPrivate" ? value === "true" : value,
     }));
+    setTouched({ ...touched, [e.target.name]: true });
   };
   const isFormComplete =
     tempAnswers.repoName.trim() !== "" &&
@@ -341,19 +338,21 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
         <Box display="flex" justifyContent="center" gap={2} mt={3}>
           <Button
             variant="contained"
-            disabled={!isFormComplete}
+            disabled={loading || !isFormComplete}
             onClick={handleConfirm}
             sx={{
-              backgroundColor: "black",
+              backgroundColor: loading ? "#666" : "black",
               color: "white",
               "&:hover": {
-                backgroundColor: "#333",
+                backgroundColor: loading ? "#666" : "#333",
               },
             }}
           >
-            Confirm
+            {loading && (
+              <CircularProgress size={20} sx={{ color: "white", mr: 2 }} />
+            )}
+            {loading ? "Loading..." : "Confirm"}
           </Button>
-
           <Button
             variant="outlined"
             onClick={handleGoToForm}
