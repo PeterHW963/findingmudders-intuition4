@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
 import ProjectCard from "./ProjectCard"; // Import ProjectCard
 
 const randomUrls = [
@@ -7,6 +8,7 @@ const randomUrls = [
   { name: "ip: Ai Hoshino", url: "https://google.com" },
   { name: "findingbrUdders", url: "https://github.com" },
 ];
+
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -36,7 +38,8 @@ export default function Landing() {
   const handleAddProject = () => {
     const newProject = {
       id: Date.now(),
-      name: `New Project ${projects.length + 1}`,
+      name: "Project ${projects.length + 1}",
+      description: "Test project",
     };
     setProjects([newProject, ...projects]);
   };
@@ -44,7 +47,7 @@ export default function Landing() {
   return (
     <>
       <div className="min-h-screen flex flex-col">
-        <h1>RicoAI</h1>
+        <h1 style={{ fontFamily: "Roboto, Arial, sans-serif" }}>RicoAI</h1>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "10px" }}>

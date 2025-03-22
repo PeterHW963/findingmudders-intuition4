@@ -1,4 +1,5 @@
 import React from "react";
+import "./ProjectCard.css";
 
 export default function ProjectCard({ name, description }) {
     return (
