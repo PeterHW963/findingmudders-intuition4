@@ -1,20 +1,31 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
+import { TextField, Button, Box, Typography } from "@mui/material";
 
 export default function App() {
-const [submitted, setSubmitted] = useState(false);
-const [confirmed, setConfirmed] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
 
-  return(
+  return (
     <>
-      <div></div>
-      {submitted ? 
-        confirmed ? <Success />
-          : <Confirmation setConfirmed={setConfirmed} setSubmitted={setSubmitted}/>
-      : <Form setSubmitted={setSubmitted} />}
+      <div>
+        <h1>RicoAI</h1>
+      </div>
+      {submitted ? (
+        confirmed ? (
+          <Success />
+        ) : (
+          <Confirmation
+            setConfirmed={setConfirmed}
+            setSubmitted={setSubmitted}
+          />
+        )
+      ) : (
+        <Form setSubmitted={setSubmitted} />
+      )}
     </>
-  )
+  );
 }
 
 function Success() {
@@ -42,11 +53,11 @@ function Success() {
 
 function Confirmation({ setConfirmed, setSubmitted }) {
   const handleGoToSuccess = () => {
-    setConfirmed(true)
-  }
-    
+    setConfirmed(true);
+  };
+
   const handleGoToForm = () => {
-    setSubmitted(false)
+    setSubmitted(false);
   };
   const [answers, setAnswers] = useState({
     repoName: "",
@@ -84,10 +95,7 @@ function Confirmation({ setConfirmed, setSubmitted }) {
           correct!
         </label>
 
-
-          <div>DATAAAAAAAAAAAAAAAAAAAaa</div>
-
-        
+        <div>DATAAAAAAAAAAAAAAAAAAAaa</div>
 
         <div>
           <label>
@@ -139,7 +147,9 @@ function Confirmation({ setConfirmed, setSubmitted }) {
         </div>
 
         <label>
-          <button disabled={!isFormComplete} onClick={handleGoToSuccess}>Confirm!</button>
+          <button disabled={!isFormComplete} onClick={handleGoToSuccess}>
+            Confirm!
+          </button>
         </label>
 
         <label>
@@ -151,13 +161,19 @@ function Confirmation({ setConfirmed, setSubmitted }) {
 }
 
 function Form({ setSubmitted }) {
-
   const [answers, setAnswers] = useState({
     question1: "",
     question2: "",
     question3: "",
     question4: "",
     question5: "",
+  });
+  const [touched, setTouched] = useState({
+    question1: false,
+    question2: false,
+    question3: false,
+    question4: false,
+    question5: false,
   });
   const [tempAnswers, setTempAnswers] = useState({
     question1: "",
@@ -169,9 +185,8 @@ function Form({ setSubmitted }) {
 
   const handleChange = (e) => {
     setTempAnswers({ ...tempAnswers, [e.target.name]: e.target.value });
+    setTouched({ ...touched, [e.target.name]: true });
   };
-
-
 
   const handleSubmit = () => {
     setSubmitted(true);
@@ -179,76 +194,119 @@ function Form({ setSubmitted }) {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "400px", margin: "auto" }}>
-      <label>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{
+        maxWidth: 600,
+        mx: "auto",
+        p: 3,
+        border: "1px solid #ccc",
+        borderRadius: 2,
+        boxShadow: 2,
+      }}
+    >
+      <Typography variant="body1" mt={2} align="left">
         Q1: Give us a short description of what you want your app to do?
-        <textarea
-          name="question1"
-          value={tempAnswers.question1}
-          onChange={handleChange}
-          maxLength={500} // Limit to 500 characters
-          style={{
-            display: "block",
-            margin: "10px 0",
-            width: "100%",
-            minHeight: "20px", // Initial height
-            maxHeight: "200px", // Prevents excessive expansion
-            overflowY: "auto", // Enables scrolling if text exceeds max height
-            resize: "none", // Prevents manual resizing
-          }}
-        />
-      </label>
+      </Typography>
+      <TextField
+        fullWidth
+        name="question1"
+        value={tempAnswers.question1}
+        onChange={handleChange}
+        margin="normal"
+        required
+        error={touched.question1 && tempAnswers.question1 === ""}
+        helperText={
+          touched.question1 && tempAnswers.question1 === ""
+            ? "This field is required"
+            : ""
+        }
+      />
 
-      <label>
+      <Typography variant="body1" mt={3} mb={1} align="left">
         Q2: What are the features of your application?
-        <input
-          type="text"
-          name="question2"
-          value={tempAnswers.question2}
-          onChange={handleChange}
-          style={{ display: "block", margin: "10px 0", width: "100%" }}
-        />
-      </label>
-      <label>
-        Q3: How many hours a day are you willing to commit?
-        <input
-          type="text"
-          name="question3"
-          value={tempAnswers.question3}
-          onChange={handleChange}
-          style={{ display: "block", margin: "10px 0", width: "100%" }}
-        />
-      </label>
-      <label>
-        Q4: When do you want this project to be completed by? Enter in terms of
-        months/weeks.
-        <input
-          type="text"
-          name="question4"
-          value={tempAnswers.question4}
-          onChange={handleChange}
-          style={{ display: "block", margin: "10px 0", width: "100%" }}
-        />
-      </label>
-      <label>
-        Q5: What tech stack do you want to use? (optional)
-        <input
-          type="text"
-          name="question5"
-          value={tempAnswers.question5}
-          onChange={handleChange}
-          style={{ display: "block", margin: "10px 0", width: "100%" }}
-        />
-      </label>
+      </Typography>
+      <TextField
+        fullWidth
+        name="question2"
+        multiline
+        rows={4}
+        value={tempAnswers.question2}
+        onChange={handleChange}
+        margin="normal"
+        required
+        error={touched.question2 && tempAnswers.question2 === ""}
+        helperText={
+          touched.question2 && tempAnswers.question2 === ""
+            ? "This field is required"
+            : ""
+        }
+      />
 
-      <div>
-        <button
-          onClick={handleSubmit}
-          style={{ marginTop: "10px", padding: "10px" }}
-        >
-          Submit
-        </button>
-      </div>
-    </div>
+      <Typography variant="body1" mt={3} mb={1} align="left">
+        Q3: How many hours a day are you willing to commit?
+      </Typography>
+      <TextField
+        fullWidth
+        name="question3"
+        rows={4}
+        value={tempAnswers.question3}
+        onChange={handleChange}
+        margin="normal"
+        required
+        error={touched.question3 && tempAnswers.question3 === ""}
+        helperText={
+          touched.question3 && tempAnswers.question3 === ""
+            ? "This field is required"
+            : ""
+        }
+      />
+      <Typography variant="body1" mt={3} mb={1} align="left">
+        Q4: When do you want this project to be completed by? Enter in terms
+        months/weeks.
+      </Typography>
+      <TextField
+        fullWidth
+        name="question4"
+        value={tempAnswers.question4}
+        onChange={handleChange}
+        margin="normal"
+        required
+        error={touched.question4 && tempAnswers.question4 === ""}
+        helperText={
+          touched.question4 && tempAnswers.question4 === ""
+            ? "This field is required"
+            : ""
+        }
+      />
+
+      <Typography variant="body1" mt={3} mb={1} align="left">
+        Q5: What tech stack do you want to use? (optional)
+      </Typography>
+      <TextField
+        fullWidth
+        name="question5"
+        value={tempAnswers.question5}
+        onChange={handleChange}
+        margin="normal"
+      />
+
+      <Button
+        type="submit"
+        variant="contained"
+        fullWidth
+        sx={{
+          mt: 2,
+          backgroundColor: "black",
+          color: "white",
+          "&:hover": {
+            backgroundColor: "#333", // Optional: darker shade on hover
+          },
+        }}
+      >
+        Submit
+      </Button>
+    </Box>
   );
 }
