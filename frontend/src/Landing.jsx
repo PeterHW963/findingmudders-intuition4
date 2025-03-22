@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ProjectCard from "./ProjectCard";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -10,7 +11,8 @@ export default function Landing() {
   const handleAddProject = () => {
     const newProject = {
       id: Date.now(),
-      name: `New Project ${projects.length + 1}`,
+      name: "Project ${projects.length + 1}",
+      description: "Test project",
     };
     setProjects([newProject, ...projects]);
   };
@@ -38,12 +40,11 @@ export default function Landing() {
 
       <div>
         {projects.map((project) => (
-          <div
+          <ProjectCard
             key={project.id}
-            className="bg-gray-800 p-4 rounded shadow text-lg"
-          >
-            {project.name}
-          </div>
+            name={project.name}
+            description={project.description}
+          ></ProjectCard>
         ))}
       </div>
     </>
