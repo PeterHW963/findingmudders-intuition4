@@ -287,19 +287,18 @@ async def get_access_token(code: str):
         raise HTTPException(status_code=400, detail="Failed to get access token")
     data = response.json()
     return {"access_token": data.get("access_token")}
-
+    
 @app.get("/getUserData")
 async def get_user_data(request: Request):
     token = request.headers.get("Authorization", "").replace("Bearer ", "")
     if not token:
         raise HTTPException(status_code=401, detail="No token provided")
     url = "https://api.github.com/user"
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = {"Authorization": f"token {token}"}  # Changed from "Bearer {token}" to "token {token}"
     response = requests.get(url, headers=headers)
     if response.status_code != 200:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(status_code=response.status_code, detail=f"API error: {response.text}")
     return response.json()
-    
 
 def create_github_repo(repo_name, description, private, token):
     """Create a new GitHub repository."""
