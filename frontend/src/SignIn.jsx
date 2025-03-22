@@ -1,5 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
+import Landing from "./Landing";
 
 const CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_KEY;
 
@@ -63,12 +64,7 @@ export default function SignIn() {
     <>
       {localStorage.getItem("accessToken") ? (
         <>
-          <nav>
-            <button onClick={accessForm}>
-              <a href="./Form.jsx"></a>
-              Go to Form
-            </button>
-          </nav>
+          <Landing />
         </>
       ) : (
         <>
