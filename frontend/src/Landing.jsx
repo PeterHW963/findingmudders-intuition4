@@ -22,7 +22,18 @@ export default function Landing() {
       </div>
 
       <div>
-        <button onClick={handleGoToForm}>+ Add New Project</button>
+        <button
+          style={{
+            width: "1000px",
+            backgroundColor: "#f0f0f0",
+            padding: "16px",
+            color: "black",
+            fontSize: "25px",
+          }}
+          onClick={handleGoToForm}
+        >
+          + Add New Project
+        </button>
       </div>
 
       <div>
