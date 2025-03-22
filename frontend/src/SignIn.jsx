@@ -77,6 +77,9 @@ export default function SignIn() {
           <Box
             sx={{
               minHeight: "20vh",
+              mx: "auto",
+              mt: 5,
+              maxWidth: "25vw",
               backgroundColor: "white",
               color: "black",
               display: "flex",
@@ -95,7 +98,13 @@ export default function SignIn() {
               variant="outlined"
               onClick={loginWithGithub}
               startIcon={<GitHubIcon />}
-              sx={{ textTransform: "none" }}
+              sx={{
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "#f0f0f0",
+                  borderColor: "black",
+                },
+              }}
               color="black"
               borderColor="black"
             >
