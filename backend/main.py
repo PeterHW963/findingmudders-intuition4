@@ -127,8 +127,9 @@ def generate_project_data(request: GenerateProjectDataRequest):
 def create_repo(request: CreateRepoRequest):
     """Create a GitHub repository and populate it with milestones and issues."""
     try:
+        new_repo_name = request.repo_name.replace(' ', '-')
         result = create_repo_and_process_milestones_and_issues(
-            request.repo_name,
+            new_repo_name,
             request.repo_description,
             request.private,
             request.token,
@@ -230,7 +231,7 @@ def create_issue(repo_owner, repo_name, token, issue_data, milestone_number):
         print(f"Issue '{issue_data['title']}' created successfully!")
     else:
         print(f"Failed to create issue: {response.status_code}")
-        
+
 def create_repo_and_process_milestones_and_issues(repo_name, repo_description, private, token, json_data):
     """Create a GitHub repo and populate it with milestones and issues."""
     repo_link = create_github_repo(repo_name, repo_description, private, token)
