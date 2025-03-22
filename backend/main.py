@@ -146,7 +146,7 @@ def create_repo(request: CreateRepoRequest):
             request.project_data
         )
         if 'success' in result and result['success']:
-            return {"message": "Repository created successfully", "repo_url": result['repo_url']}
+            return result['repo_url']
         else:
             raise HTTPException(status_code=400, detail=result.get('message', 'Unknown error'))
     except json.JSONDecodeError:

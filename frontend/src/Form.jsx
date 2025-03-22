@@ -18,6 +18,7 @@ export default function App() {
   const [submitted, setSubmitted] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [response, setResponse] = useState(null);
+  const [confirmationResponse, setConfirmationResponse] = useState(null);
 
   return (
     <>
@@ -26,11 +27,12 @@ export default function App() {
       </div>
       {submitted ? (
         confirmed ? (
-          <Success />
+          <Success confirmationResponse={confirmationResponse} />
         ) : (
           <Confirmation
             setConfirmed={setConfirmed}
             setSubmitted={setSubmitted}
+            setConfirmationResponse={setConfirmationResponse}
             response={response}
           />
         )
@@ -41,11 +43,14 @@ export default function App() {
   );
 }
 
-function Success() {
+function Success({ confirmationResponse }) {
   const navigate = useNavigate();
   const handleChange = () => {
     navigate("/landing");
   };
+
+  const github_repo_link = confirmationResponse;
+
   return (
     <>
       <div
@@ -64,6 +69,11 @@ function Success() {
         >
           Success! Project created 🥳
         </h1>
+        <h2>
+          <a href={github_repo_link} target="_blank" rel="noopener noreferrer">
+            {github_repo_link}
+          </a>
+        </h2>
       </div>
 
       <Button
@@ -84,7 +94,12 @@ function Success() {
   );
 }
 
-function Confirmation({ setConfirmed, setSubmitted, response }) {
+function Confirmation({
+  setConfirmed,
+  setSubmitted,
+  setConfirmationResponse,
+  response,
+}) {
   const parseDescriptionToList = (description) => {
     // Split the description by numbers, keeping the numbered steps intact
     const steps = description.split(/\d+\.\s/).filter(Boolean); // Remove empty results from split
@@ -138,7 +153,8 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
       setAnswers(tempAnswers); // make sure tempAnswers is defined
       setConfirmed(true);
       setLoading(false);
-      console.log(reply);
+      console.log("reply: " + reply);
+      setConfirmationResponse(reply.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("❌ Axios Error:", error.message);

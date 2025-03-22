@@ -72,7 +72,14 @@ export default function SignIn() {
       ) : (
         <>
           <div>
-            <h1 style={{ color: "black" }}>RicoAI</h1>
+            <h1
+              style={{
+                color: "black",
+                fontFamily: "Roboto, Arial, sans-serif",
+              }}
+            >
+              RicoAI
+            </h1>
           </div>
           <Box
             sx={{
