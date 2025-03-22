@@ -13,6 +13,7 @@ import {
   InputLabel,
 } from "@mui/material";
 import axios from "axios";
+import { AppContext } from "./AppContext";
 
 export default function App() {
   const [submitted, setSubmitted] = useState(false);
@@ -148,6 +149,8 @@ function Confirmation({
   });
   const [loading, setLoading] = useState(false);
 
+  const { setSharedState } = useContext(AppContext);
+
   const api = axios.create({
     baseURL: "https://ricoai1-526454760b6c.herokuapp.com",
   });
@@ -165,6 +168,16 @@ function Confirmation({
         token: tempAnswers.PAT,
         project_data: projectData,
       });
+      const usernameReply = await api.get("/get-github-username", {
+        headers: {
+          token: tempAnswers.PAT,
+        },
+      });
+
+      setSharedState((prevState) => ({
+        ...prevState,
+        githubUsername: usernameReply.data.username,
+      }));
 
       setAnswers(tempAnswers); // make sure tempAnswers is defined
       setConfirmed(true);
