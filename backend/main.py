@@ -143,6 +143,123 @@ def create_repo(request: CreateRepoRequest):
         raise HTTPException(status_code=400, detail="Invalid project_data format")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create repository: {str(e)}")
+
+
+@app.patch("/update-issue/{repo_owner}/{repo_name}/{issue_number}")
+def update_issue_to_complete(repo_owner: str, repo_name: str, issue_number: int, token: str):
+    """Update an issue to complete (closed) in the specified GitHub repository."""
+    try:
+        url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues/{issue_number}"
+        headers = {
+            "Authorization": f"token {token}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "state": "closed"
+        }
+        response = requests.patch(url, headers=headers, data=json.dumps(payload))
+        if response.status_code == 200:
+            return {"message": f"Issue #{issue_number} updated to complete (closed) successfully!"}
+        else:
+            raise HTTPException(status_code=response.status_code, detail=f"Failed to update issue #{issue_number}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update issue: {str(e)}")
+
+
+@app.patch("/update-milestone/{repo_owner}/{repo_name}/{milestone_number}")
+def update_milestone_to_complete(repo_owner: str, repo_name: str, milestone_number: int, token: str):
+    """Update a milestone to complete (closed) if all its issues are closed."""
+    try:
+        url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/milestones/{milestone_number}/issues"
+        headers = {
+            "Authorization": f"token {token}",
+            "Content-Type": "application/json",
+        }
+        # Fetch all issues for the milestone
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            issues = response.json()
+            all_completed = all(issue['state'] == 'closed' for issue in issues)
+            if all_completed:
+                milestone_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/milestones/{milestone_number}"
+                milestone_payload = {
+                    "state": "closed"
+                }
+                milestone_response = requests.patch(milestone_url, headers=headers, data=json.dumps(milestone_payload))
+                if milestone_response.status_code == 200:
+                    return {"message": f"Milestone #{milestone_number} updated to complete (closed) successfully!"}
+                else:
+                    raise HTTPException(status_code=milestone_response.status_code, detail=f"Failed to update milestone #{milestone_number}")
+            else:
+                return {"message": f"Milestone #{milestone_number} cannot be completed as not all issues are closed."}
+        else:
+            raise HTTPException(status_code=response.status_code, detail=f"Failed to fetch issues for milestone #{milestone_number}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update milestone: {str(e)}")
+
+
+@app.get("/fetch-milestones/{repo_owner}/{repo_name}")
+def fetch_all_milestones_and_issues(repo_owner: str, repo_name: str, token: str):
+    """Fetch all milestones and their pertaining issues (open and closed) in the specified GitHub repository."""
+    try:
+        # Step 1: Fetch all milestones
+        url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/milestones"
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28"
+        }
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=f"Failed to fetch milestones: {response.text}")
+
+        milestones = response.json()
+        result = []
+
+        # Step 2: For each milestone, fetch all issues (open and closed)
+        for milestone in milestones:
+            milestone_number = milestone['number']
+            issues_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues"
+            params = {
+                "milestone": milestone_number,
+                "state": "all",  # Fetch both open and closed issues
+                "per_page": 100  # Max results per page to reduce pagination needs
+            }
+            issues_response = requests.get(issues_url, headers=headers, params=params)
+
+            if issues_response.status_code != 200:
+                raise HTTPException(status_code=issues_response.status_code, 
+                                   detail=f"Failed to fetch issues for milestone #{milestone_number}: {issues_response.text}")
+
+            issues = issues_response.json()
+            # Simplify issues data to include only relevant fields
+            simplified_issues = [
+                {
+                    "number": issue["number"],
+                    "title": issue["title"],
+                    "state": issue["state"],
+                    "created_at": issue["created_at"],
+                    "closed_at": issue["closed_at"] if issue["state"] == "closed" else None
+                }
+                for issue in issues
+            ]
+
+            result.append({
+                "milestone": {
+                    "number": milestone["number"],
+                    "title": milestone["title"],
+                    "state": milestone["state"],
+                    "description": milestone["description"]
+                },
+                "issues": simplified_issues
+            })
+
+        # Step 3: Return the result in JSON format
+        return result
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch milestones and issues: {str(e)}")
     
 
 def create_github_repo(repo_name, description, private, token):
