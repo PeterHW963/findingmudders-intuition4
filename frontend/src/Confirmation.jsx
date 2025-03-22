@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useContext  } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Confirmation() {
+
   const navigate = useNavigate();
   const handleGoToForm = () => {
     navigate("/form");
@@ -42,7 +43,10 @@ export default function Confirmation() {
           correct!
         </label>
 
-        <div>JSON</div>
+
+          <div>DATAAAAAAAAAAAAAAAAAAAaa</div>
+
+        
 
         <div>
           <label>
