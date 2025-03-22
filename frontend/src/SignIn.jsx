@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-
+import Landing from "./Landing";
 
 const CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_KEY;
 
@@ -13,19 +13,21 @@ export default function SignIn() {
     const codeParam = urlParams.get("code");
     console.log(codeParam);
 
-    if(codeParam && (localStorage.getItem("accessToken") === null)) {
+    if (codeParam && localStorage.getItem("accessToken") === null) {
       async function getAccessToken() {
         await fetch("http://localhost:4000/getAccessToken?code=" + codeParam, {
-          method: "GET"
-        }).then((response) => {
-          return response.json();
-        }).then((data) => {
-          console.log(data);
-          if(data.access_token) {
-            localStorage.setItem("accessToken", data.access_token);
-            setRerender(!rerender);
-          }
+          method: "GET",
         })
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data);
+            if (data.access_token) {
+              localStorage.setItem("accessToken", data.access_token);
+              setRerender(!rerender);
+            }
+          });
       }
 
       getAccessToken();
@@ -37,35 +39,34 @@ export default function SignIn() {
     await fetch("http://localhost:4000/getUserData", {
       method: "GET",
       headers: {
-        "Authorization": "Bearer " + localStorage.getItem("accessToken") //bearer access token
-      }
-    }).then((response) => {
-      return response.json();
-    }).then((data) => {
-      console.log(data);
+        Authorization: "Bearer " + localStorage.getItem("accessToken"), //bearer access token
+      },
     })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+      });
   }
 
   function accessForm() {
-    console.log("FORM CLICKED")
+    console.log("FORM CLICKED");
   }
 
   function loginWithGithub() {
-    window.location.assign("https://github.com/login/oauth/authorize?client_id=" + CLIENT_ID);
+    window.location.assign(
+      "https://github.com/login/oauth/authorize?client_id=" + CLIENT_ID
+    );
   }
 
   return (
     <>
-      {localStorage.getItem("accessToken") ? 
+      {localStorage.getItem("accessToken") ? (
         <>
-          <nav>
-            <button onClick={accessForm}>
-              <a href="./Form.jsx"></a>
-              Go to Form
-            </button>
-          </nav>
+          <Landing />
         </>
-        :
+      ) : (
         <>
           <div className="min-h-screen flex flex-col">
             <h1>RicoAI</h1>
@@ -73,9 +74,11 @@ export default function SignIn() {
           <div className="bg-white rounded-xl shadow-md p-8 max-w-xl w-full mx-auto">
             <h2 className="text-2xl font-bold text-center">Sign In</h2>
           </div>
-          <button onClick={loginWithGithub}>Sign in using GitHub account</button> 
+          <button onClick={loginWithGithub}>
+            Sign in using GitHub account
+          </button>
         </>
-      }
+      )}
     </>
   );
 }
