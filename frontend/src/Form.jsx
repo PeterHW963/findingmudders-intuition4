@@ -12,7 +12,7 @@ export default function App() {
   return (
     <>
       <div>
-        <h1>RicoAI</h1>
+        <h1 style={{ fontFamily: "Arial, Roboto, sans-serif" }}>RicoAI</h1>
       </div>
       {submitted ? (
         confirmed ? (
@@ -55,6 +55,12 @@ function Success() {
 }
 
 function Confirmation({ setConfirmed, setSubmitted, response }) {
+  const parseDescriptionToList = (description) => {
+    // Split the description by numbers, keeping the numbered steps intact
+    const steps = description.split(/\d+\.\s/).filter(Boolean); // Remove empty results from split
+    return steps.map((step, index) => <li key={index}>{step}</li>);
+  };
+
   const handleGoToSuccess = () => {
     setConfirmed(true);
   };
@@ -77,6 +83,8 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
     isPrivate: "",
   });
 
+  const project_details = response | {};
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTempAnswers((prev) => ({
@@ -93,19 +101,69 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
   return (
     <>
       <div>
-        <label>
-          The following is your submitted input... Kindly check if this is
-          correct!
-        </label>
+        <h1 style={{ fontFamily: "Roboto, Arial, sans-serif" }}>
+          Project Details
+        </h1>
 
-        {response ? (
-          <div>
-            <h3>Project Details:</h3>
-            <div>{JSON.stringify(response)}</div>
-          </div>
-        ) : (
-          <p>No data available.</p>
-        )}
+        <Box
+          component="form"
+          sx={{
+            maxWidth: 1500,
+            mx: "auto",
+            p: 3,
+            border: "1px solid #ccc",
+            borderRadius: 2,
+            boxShadow: 2,
+            fontFamily: "Roboto, Arial, sans-serif",
+          }}
+        >
+          <h3
+            style={{
+              fontFamily: "Roboto, Arial, sans-serif",
+              textAlign: "left",
+            }}
+          >
+            Summary
+          </h3>
+          <p
+            style={{
+              fontFamily: "Roboto, Arial, sans-serif",
+              textAlign: "left",
+            }}
+          >
+            {response.summary}
+          </p>
+          <h2
+            style={{
+              fontFamily: "Roboto, Arial, sans-serif",
+              textDecoration: "underline",
+              textAlign: "left",
+            }}
+          >
+            Milestones
+          </h2>
+          {response.milestones &&
+            response.milestones.map((milestone, index) => (
+              <div key={index} style={{ marginBottom: "20px" }}>
+                <h3 style={{ textAlign: "left" }}>
+                  {index + 1}. {milestone.title}{" "}
+                </h3>
+                <p style={{ textAlign: "left" }}>{milestone.description}</p>
+                <p style={{ textAlign: "left" }}>
+                  <strong>Due Date:</strong> {milestone.due_date}
+                </p>
+
+                <h4 style={{ textAlign: "left" }}>Issues:</h4>
+                <ul style={{ textAlign: "left" }}>
+                  {milestone.issues.map((issue, idx) => (
+                    <li key={idx} style={{ padding: "5px" }}>
+                      <strong>{issue.title}:</strong> {issue.description}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+        </Box>
 
         <div>
           <label>
