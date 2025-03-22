@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function SignIn() {
   return (
@@ -9,15 +10,9 @@ export default function SignIn() {
       <div className="bg-white rounded-xl shadow-md p-8 max-w-xl w-full mx-auto">
         <h2 className="text-2xl font-bold text-center">Sign In</h2>
       </div>
-      <nav>
-        <button>Sign in using GitHub account</button>
-      </nav>
-      <nav>
-        <button>
-          <a href="./Form.jsx"></a>
-          Go to Form
-        </button>
-      </nav>
+      <div>
+        <button>Sign In using GitHub</button>
+      </div>
     </>
   );
 }
