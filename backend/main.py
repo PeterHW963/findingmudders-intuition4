@@ -272,6 +272,35 @@ def fetch_all_milestones_and_issues(repo_owner: str, repo_name: str, token: str)
         raise HTTPException(status_code=500, detail=f"Failed to fetch milestones and issues: {str(e)}")
     
 
+# New OAuth endpoints
+@app.get("/getAccessToken")
+async def get_access_token(code: str):
+    url = "https://github.com/login/oauth/access_token"
+    params = {
+        "client_id": os.getenv('VITE_GITHUB_CLIENT_KEY'),
+        "client_secret": os.getenv('VITE_GITHUB_CLIENT_SECRETS'),
+        "code": code
+    }
+    headers = {"Accept": "application/json"}
+    response = requests.post(url, params=params, headers=headers)
+    if response.status_code != 200:
+        raise HTTPException(status_code=400, detail="Failed to get access token")
+    data = response.json()
+    return {"access_token": data.get("access_token")}
+
+@app.get("/getUserData")
+async def get_user_data(request: Request):
+    token = request.headers.get("Authorization", "").replace("Bearer ", "")
+    if not token:
+        raise HTTPException(status_code=401, detail="No token provided")
+    url = "https://api.github.com/user"
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    return response.json()
+    
+
 def create_github_repo(repo_name, description, private, token):
     """Create a new GitHub repository."""
     url = "https://api.github.com/user/repos"
