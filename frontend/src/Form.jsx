@@ -2,10 +2,12 @@ import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
 import { TextField, Button, Box, Typography } from "@mui/material";
+import axios from "axios";
 
 export default function App() {
   const [submitted, setSubmitted] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [response, setResponse] = useState(null);
 
   return (
     <>
@@ -19,10 +21,11 @@ export default function App() {
           <Confirmation
             setConfirmed={setConfirmed}
             setSubmitted={setSubmitted}
+            response={response}
           />
         )
       ) : (
-        <Form setSubmitted={setSubmitted} />
+        <Form setResponse={setResponse} setSubmitted={setSubmitted} />
       )}
     </>
   );
@@ -51,7 +54,7 @@ function Success() {
   );
 }
 
-function Confirmation({ setConfirmed, setSubmitted }) {
+function Confirmation({ setConfirmed, setSubmitted, response }) {
   const handleGoToSuccess = () => {
     setConfirmed(true);
   };
@@ -95,7 +98,14 @@ function Confirmation({ setConfirmed, setSubmitted }) {
           correct!
         </label>
 
-        <div>DATAAAAAAAAAAAAAAAAAAAaa</div>
+        {response ? (
+          <div>
+            <h3>Project Details:</h3>
+            <div>{JSON.stringify(response)}</div>
+          </div>
+        ) : (
+          <p>No data available.</p>
+        )}
 
         <div>
           <label>
@@ -160,7 +170,7 @@ function Confirmation({ setConfirmed, setSubmitted }) {
   );
 }
 
-function Form({ setSubmitted }) {
+function Form({ setSubmitted, setResponse }) {
   const [answers, setAnswers] = useState({
     question1: "",
     question2: "",
@@ -188,15 +198,38 @@ function Form({ setSubmitted }) {
     setTouched({ ...touched, [e.target.name]: true });
   };
 
-  const handleSubmit = () => {
-    setSubmitted(true);
-    setAnswers(tempAnswers);
+  const api = axios.create({
+    baseURL: "https://ricoai1-526454760b6c.herokuapp.com",
+  });
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await api.post("/generate-project-data", {
+        project_description: tempAnswers.question1,
+        features: tempAnswers.question2,
+        duration: tempAnswers.question4,
+        hours_per_day: tempAnswers.question3,
+        tech_stack: tempAnswers.question5,
+      });
+
+      console.log("✅ Response:", response.data);
+      setResponse(response.data);
+      setSubmitted(true);
+      setAnswers(tempAnswers); // make sure tempAnswers is defined
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("❌ Axios Error:", error.message);
+        console.log("Response:", error.response);
+      } else {
+        console.error("❌ Unknown Error:", error);
+      }
+    }
   };
 
   return (
     <Box
       component="form"
-      onSubmit={handleSubmit}
       sx={{
         maxWidth: 600,
         mx: "auto",
@@ -312,6 +345,7 @@ function Form({ setSubmitted }) {
             backgroundColor: "#333", // Optional: darker shade on hover
           },
         }}
+        onClick={handleSubmit}
       >
         Submit
       </Button>
