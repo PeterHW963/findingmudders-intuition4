@@ -249,16 +249,24 @@ function Form({ setSubmitted }) {
       </Typography>
       <TextField
         fullWidth
+        type="number"
+        inputProps={{ min: 1 }}
         name="question3"
         rows={4}
         value={tempAnswers.question3}
         onChange={handleChange}
         margin="normal"
         required
-        error={touched.question3 && tempAnswers.question3 === ""}
+        error={
+          touched.question3 &&
+          (tempAnswers.question3 === "" ||
+            !Number.isInteger(Number(tempAnswers.question3)))
+        }
         helperText={
-          touched.question3 && tempAnswers.question3 === ""
-            ? "This field is required"
+          touched.question3 &&
+          (tempAnswers.question3 === "" ||
+            !Number.isInteger(Number(tempAnswers.question3)))
+            ? "Please enter a valid whole number"
             : ""
         }
       />

@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from typing import Optional
 from openai import OpenAI
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pymongo import MongoClient
 from bson import ObjectId
@@ -16,6 +17,15 @@ openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
 
 app = FastAPI()
+
+# CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Content-Type"],
+)
 
 db = mongo_client[os.getenv('DB_NAME')]
 userprojects_collection = db["userprojects"]
