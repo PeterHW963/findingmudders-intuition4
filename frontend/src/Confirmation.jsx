@@ -6,6 +6,9 @@ export default function Confirmation() {
   const handleGoToForm = () => {
     navigate("/form");
   };
+  const handleConfirmation = () => {
+    navigate("/success");
+  };
   const [answers, setAnswers] = useState({
     repoName: "",
     repoDescription: "",
@@ -94,7 +97,9 @@ export default function Confirmation() {
         </div>
 
         <label>
-          <button disabled={!isFormComplete}>Confirm!</button>
+          <button disabled={!isFormComplete} onClick={handleConfirmation}>
+            Confirm!
+          </button>
         </label>
 
         <label>
