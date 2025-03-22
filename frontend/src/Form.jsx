@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./App.css";
 
 function App() {
@@ -21,8 +22,13 @@ function App() {
     setTempAnswers({ ...tempAnswers, [e.target.name]: e.target.value });
   };
 
+  const navigate = useNavigate();
+  const handleConfirmation = () => {
+    navigate("/confirmation");
+  };
+
   const handleSubmit = () => {
-    setAnswers(tempAnswers); // Update answers only on submit
+    setAnswers(tempAnswers), handleConfirmation();
   };
 
   return (
@@ -96,16 +102,6 @@ function App() {
           Submit
         </button>
       </div>
-
-      <label>
-        The following is your submitted input... Kindly check if this is
-        correct!
-        <div>{answers.question1}</div>
-        <div>{answers.question2}</div>
-        <div>{answers.question3}</div>
-        <div>{answers.question4}</div>
-        <div>{answers.question5}</div>
-      </label>
     </div>
   );
 }
