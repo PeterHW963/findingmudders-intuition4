@@ -1,9 +1,12 @@
+import os
 import openai
-import typing
 import json
+from dotenv import load_dotenv
 from typing import Optional
 
-openai.api_key = "your_openai_api_key"
+load_dotenv()
+
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
 def milestone_and_issue_creator(description: str,
