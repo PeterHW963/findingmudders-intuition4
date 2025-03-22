@@ -33,6 +33,13 @@ class UserProjectUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
 
+class GenerateProjectDataRequest(BaseModel):
+    project_description: str
+    features: str
+    duration: str
+    hours_per_day: int
+    tech_stack: Optional[str] = None
+
 def project_doc_helper(project: dict) -> dict:
     """Converts a MongoDB project document into a JSON-friendly dictionary."""
     return {
@@ -89,9 +96,24 @@ def get_user_projects(username: str):
     return user_projects
 
 # ----------------------------------------------------------------
-# OpenAI Functions
+# OpenAI Endpoints & Functions
 # ----------------------------------------------------------------
 
+@app.post("/generate-project-data")
+def generate_project_data(request: GenerateProjectDataRequest):
+    """Generate project summary, milestones, and issues using OpenAI."""
+    try:
+        json_data = milestone_and_issue_creator(
+            request.project_description,
+            request.features,
+            request.duration,
+            request.hours_per_day,
+            request.tech_stack
+        )
+        return json.loads(json_data)  # Return as JSON object
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate project data: {str(e)}")
+    
 def milestone_and_issue_creator(description: str,
                                 features: str,
                                 duration: str,
