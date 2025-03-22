@@ -1,7 +1,17 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
-import { TextField, Button, Box, Typography } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  CircularProgress,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
 import axios from "axios";
 
 export default function App() {
@@ -69,6 +79,13 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
     PAT: "",
     isPrivate: "",
   });
+  const [touched, setTouched] = useState({
+    repoName: false,
+    repoDescription: false,
+    repoPrivacy: false,
+    PAT: false,
+    isPrivate: false,
+  });
   const [tempAnswers, setTempAnswers] = useState({
     repoName: "",
     repoDescription: "",
@@ -107,64 +124,131 @@ function Confirmation({ setConfirmed, setSubmitted, response }) {
           <p>No data available.</p>
         )}
 
-        <div>
-          <label>
-            What is your desired repository name?
-            <input
-              type="text"
-              name="repoName"
-              value={tempAnswers.repoName}
-              onChange={handleChange}
-              style={{ display: "block", margin: "10px 0", width: "100%" }}
-            />
-          </label>
+        <Box
+          component="form"
+          sx={{
+            maxWidth: 7500,
+            mx: "auto",
+            p: 3,
+            border: "1px solid #ccc",
+            borderRadius: 2,
+            boxShadow: 2,
+          }}
+        >
+          <Typography variant="body1" mt={2} align="left">
+            Q1: Enter a repository name
+          </Typography>
+          <TextField
+            fullWidth
+            name="repoName"
+            value={tempAnswers.repoName}
+            onChange={handleChange}
+            margin="normal"
+            required
+            error={touched.repoName && tempAnswers.repoName === ""}
+            helperText={
+              touched.repoName && tempAnswers.repoName === ""
+                ? "This field is required"
+                : ""
+            }
+          />
 
-          <label>
-            What do you want as the repository description?
-            <input
-              type="text"
-              name="repoDescription"
-              value={tempAnswers.repoDescription}
-              onChange={handleChange}
-              style={{ display: "block", margin: "10px 0", width: "100%" }}
-            />
-          </label>
+          <Typography variant="body1" mt={3} mb={1} align="left">
+            Q2: Enter a repository description
+          </Typography>
+          <TextField
+            fullWidth
+            name="repoDescription"
+            multiline
+            rows={4}
+            value={tempAnswers.repoDescription}
+            onChange={handleChange}
+            margin="normal"
+            required
+            error={
+              touched.repoDescription && tempAnswers.repoDescription === ""
+            }
+            helperText={
+              touched.repoDescription && tempAnswers.repoDescription === ""
+                ? "This field is required"
+                : ""
+            }
+          />
 
-          <label>
-            Do you want the privacy of the repository to be private?
-            <select
+          <Typography variant="body1" mt={3} mb={1} align="left">
+            Q3: Select repository accessibility
+          </Typography>
+          <FormControl
+            variant="outlined"
+            sx={{ width: "100%", alignSelf: "left" }}
+          >
+            <Select
+              labelId="repoPrivacy-label"
+              id="repoPrivacy"
               name="repoPrivacy"
               value={tempAnswers.repoPrivacy}
               onChange={handleChange}
-              style={{ display: "block", margin: "10px 0", width: "100%" }}
+              displayEmpty
+              align="start"
             >
-              <option value="">-- Select Privacy--</option>
-              <option value="true">Yes</option>
-              <option value="false">No</option>
-            </select>
-          </label>
+              {/* Placeholder MenuItem must have value="" */}
+              <MenuItem value="">
+                <em>-- Select Privacy --</em>
+              </MenuItem>
+              <MenuItem value="false">Public</MenuItem>
+              <MenuItem value="true">Private</MenuItem>
+            </Select>
+          </FormControl>
 
-          <label>
-            What is your Personal Access Token (PAT)?
-            <input
-              type="text"
-              name="PAT"
-              value={tempAnswers.PAT}
-              onChange={handleChange}
-              style={{ display: "block", margin: "10px 0", width: "100%" }}
-            />
-          </label>
-        </div>
+          <Typography variant="body1" mt={3} mb={1} align="left">
+            Q4: Enter your Github Personal Access Token (PAT)
+          </Typography>
+          <TextField
+            fullWidth
+            name="PAT"
+            value={tempAnswers.PAT}
+            onChange={handleChange}
+            margin="normal"
+            required
+            error={touched.PAT && tempAnswers.PAT === ""}
+            helperText={
+              touched.PAT && tempAnswers.PAT === ""
+                ? "This field is required"
+                : ""
+            }
+          />
+        </Box>
+        <Box display="flex" justifyContent="center" gap={2} mt={3}>
+          <Button
+            variant="contained"
+            disabled={!isFormComplete}
+            onClick={handleGoToSuccess}
+            sx={{
+              backgroundColor: "black",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "#333",
+              },
+            }}
+          >
+            Confirm
+          </Button>
 
-        <label>
-          <button disabled={!isFormComplete} onClick={handleGoToSuccess}>
-            Confirm!
-          </button>
-        </label>
-
-        <label>
-          <button onClick={handleGoToForm}>Redo again</button>
-        </label>
+          <Button
+            variant="outlined"
+            onClick={handleGoToForm}
+            sx={{
+              borderColor: "black",
+              color: "black",
+              "&:hover": {
+                backgroundColor: "#f0f0f0",
+                borderColor: "black",
+              },
+            }}
+          >
+            Edit
+          </Button>
+        </Box>
       </div>
     </>
   );
@@ -192,6 +276,12 @@ function Form({ setSubmitted, setResponse }) {
     question4: "",
     question5: "",
   });
+  const isFormComplete =
+    tempAnswers.question1.trim() !== "" &&
+    tempAnswers.question2.trim() !== "" &&
+    tempAnswers.question3.trim() !== "" &&
+    tempAnswers.question4.trim() !== "";
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setTempAnswers({ ...tempAnswers, [e.target.name]: e.target.value });
@@ -204,6 +294,7 @@ function Form({ setSubmitted, setResponse }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
     try {
       const response = await api.post("/generate-project-data", {
         project_description: tempAnswers.question1,
@@ -216,6 +307,7 @@ function Form({ setSubmitted, setResponse }) {
       console.log("✅ Response:", response.data);
       setResponse(response.data);
       setSubmitted(true);
+      setLoading(false);
       setAnswers(tempAnswers); // make sure tempAnswers is defined
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -339,15 +431,19 @@ function Form({ setSubmitted, setResponse }) {
         fullWidth
         sx={{
           mt: 2,
-          backgroundColor: "black",
+          backgroundColor: loading ? "#666" : "black",
           color: "white",
           "&:hover": {
-            backgroundColor: "#333", // Optional: darker shade on hover
+            backgroundColor: loading ? "#666" : "#333",
           },
         }}
         onClick={handleSubmit}
+        disabled={loading || !isFormComplete}
       >
-        Submit
+        {loading && (
+          <CircularProgress size={20} sx={{ color: "white", mr: 2 }} />
+        )}
+        {loading ? "Processing..." : "Submit"}
       </Button>
     </Box>
   );

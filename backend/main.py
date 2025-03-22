@@ -394,7 +394,8 @@ def milestone_and_issue_creator(description: str,
             {
                 "role": "system",
                 "content": "You are an AI product manager. Generate a project summary, milestones, and issues with "
-                           "step-by-step instructions. "
+                           f"step-by-step instructions. Be as technical as you can when generating the milestones and issues." 
+                           "Today's date is {datetime.today().strftime('%Y-%m-%d')}"
             },
             {
                 "role": "user",
@@ -466,9 +467,10 @@ def milestone_and_issue_creator(description: str,
         ],
         tool_choice={"type": "function", "function": {"name": "generate_project_summary"}}
     )
-
     tool_call = response.choices[0].message.tool_calls[0]
     return json.dumps(json.loads(tool_call.function.arguments), indent=2)
+
+
 
 # print(milestone_and_issue_creator("Create a hookup app", "Find attractive girls nearby and a chat feature to make appointment with them", "4", 6, "React Typescript, Node, and MySQL"))
 
