@@ -1,14 +1,21 @@
 import React from "react";
 import "./ProjectCard.css";
 
-export default function ProjectCard({ name, description }) {
-    return (
-        <div
-        onClick={onClick} // Make the card clickable
-        className="bg-gray-800 p-4 rounded shadow text-white cursor-pointer hover:bg-gray-700 transition"
-        >
-        <h3 className="text-lg font-bold">{name}</h3>
-        <p className="text-sm">{description}</p>
-        </div>
-    );
+export default function ProjectCard({ title }) {
+  return (
+    <div
+      style={{
+        border: "1px solid #ccc",
+        padding: "16px",
+        margin: "8px auto",
+        maxWidth: "600px",
+        borderRadius: "4px",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+      }}
+    >
+      <h2 style={{ margin: 0, fontFamily: "Roboto, Arial, sans-serif" }}>
+        {title}
+      </h2>
+    </div>
+  );
 }

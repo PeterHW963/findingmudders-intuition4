@@ -1,19 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
-import ProjectCard from "./ProjectCard"; // Import ProjectCard
-
-const randomUrls = [
-  { name: "Project Doesn't Matter", url: "https://example.com" },
-  { name: "ip: Ai Hoshino", url: "https://google.com" },
-  { name: "findingbrUdders", url: "https://github.com" },
-];
-
+import { AppContext } from "./AppContext";
+import axios from "axios";
+import { Button } from "@mui/material";
 
 export default function Landing() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true); // Track loading state
+  const { sharedState } = useContext(AppContext);
 
   const handleGoToForm = () => {
     navigate("/form");
@@ -21,28 +16,45 @@ export default function Landing() {
 
   // Dummy function to fetch data
   const dummyFunction = async () => {
-    setLoading(true); // Start loading
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
-    setProjects([
-      { name: 1, url: "google.com" },
-    ]);
-    setLoading(false); // Stop loading
+    if (sharedState.githubUsername) {
+      console.log(sharedState.githubUsername);
+    } else {
+      console.log("guest");
+    }
+  };
+
+  const fetchUserProjects = async () => {
+    // Check if the GitHub username is available from context
+    if (!sharedState.githubUsername) {
+      console.log("GitHub username not available. Cannot fetch projects.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        "https://ricoai1-526454760b6c.herokuapp.com/projects",
+        {
+          params: {
+            username: sharedState.githubUsername,
+          },
+        }
+      );
+      setProjects(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Failed to fetch user projects:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Fetch data on page load
   useEffect(() => {
     dummyFunction();
+    fetchUserProjects();
   }, []);
- 
-
-  const handleAddProject = () => {
-    const newProject = {
-      id: Date.now(),
-      name: "Project ${projects.length + 1}",
-      description: "Test project",
-    };
-    setProjects([newProject, ...projects]);
-  };
 
   return (
     <>
@@ -50,46 +62,66 @@ export default function Landing() {
         <h1 style={{ fontFamily: "Roboto, Arial, sans-serif" }}>RicoAI</h1>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "10px" }}>
-        <button
-          style={{
-            width: "1000px",
-            backgroundColor: "green",
-            padding: "16px",
-            color: "black",
-            fontSize: "25px",
-            cursor: "pointer",
-          }}
+      <div
+        style={{
+          gap: "10px",
+          marginBottom: "10px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Button
+          variant="contained"
           onClick={handleGoToForm}
+          sx={{
+            backgroundColor: loading ? "#666" : "black",
+            color: "white",
+            "&:hover": {
+              backgroundColor: loading ? "#666" : "#333",
+            },
+            width: 800,
+            height: 50,
+          }}
         >
           + Add New Project
-        </button>
+        </Button>
       </div>
 
       {loading ? (
-          <p>Loading projects...</p>
-            ) : (
-          <>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {randomUrls.map((site, index) => (
-                <button
-                  key={index}
-                  style={{
-                    width: "1000px",
-                    backgroundColor: "#f0f0f0",
-                    padding: "16px",
-                    color: "black",
-                    fontSize: "25px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => window.location.href = site.url}
-                >
-                  Go to {site.name}
-                </button>
-              ))}
-            </div>
-          </>)
-        }
+        <p>Loading projects...</p>
+      ) : projects.length > 0 ? (
+        <div
+          style={{
+            gap: "10px",
+            marginBottom: "10px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          {projects.map((project) => (
+            <Button
+              variant="outlined"
+              onClick={() => window.open(project.github_repo_link, "_blank")}
+              sx={{
+                borderColor: "black",
+                color: "black",
+                "&:hover": {
+                  backgroundColor: "#f0f0f0",
+                  borderColor: "black",
+                },
+                width: 800,
+                height: 50,
+              }}
+            >
+              {project.title}
+            </Button>
+          ))}
+        </div>
+      ) : (
+        <p>No projects found.</p>
+      )}
     </>
   );
 }
