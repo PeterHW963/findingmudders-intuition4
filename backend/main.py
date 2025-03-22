@@ -5,7 +5,7 @@ import datetime
 from dotenv import load_dotenv
 from typing import Optional
 from openai import OpenAI
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pymongo import MongoClient
