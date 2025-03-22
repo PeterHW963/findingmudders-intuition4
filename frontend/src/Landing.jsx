@@ -20,7 +20,7 @@ export default function Landing() {
   return (
     <>
       <div className="min-h-screen flex flex-col">
-        <h1>RicoAI</h1>
+        <h1 style={{ fontFamily: "Roboto, Arial, sans-serif" }}>RicoAI</h1>
       </div>
 
       <div>
