@@ -8,15 +8,15 @@ import Success from "./SuccessPage";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<SignIn />} />
-        <Route path="/landing" element={<Landing />} />
-        <Route path="/form" element={<Form />} />
-        <Route path="/confirmation" element={<Confirmation />} />
-        <Route path="/success" element={<Success />} />
-      </Routes>
-    </Router>
+      <Router>
+        <Routes>
+          <Route path="/" element={<SignIn />} />
+          <Route path="/landing" element={<Landing />} />
+          <Route path="/form" element={<Form />} />
+          <Route path="/confirmation" element={<Confirmation />} />
+          <Route path="/success" element={<Success />} />
+        </Routes>
+      </Router>
   );
 }
 
