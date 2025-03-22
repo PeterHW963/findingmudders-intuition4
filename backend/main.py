@@ -137,6 +137,7 @@ def generate_project_data(request: GenerateProjectDataRequest):
 def create_repo(request: CreateRepoRequest):
     """Create a GitHub repository and populate it with milestones and issues."""
     try:
+        github_username = get_github_username(request.token)
         new_repo_name = request.repo_name.replace(' ', '-')
         result = create_repo_and_process_milestones_and_issues(
             new_repo_name,
@@ -146,6 +147,14 @@ def create_repo(request: CreateRepoRequest):
             request.project_data
         )
         if 'success' in result and result['success']:
+            user_project = UserProject(
+                username=github_username["username"],  # Extract username from the response
+                github_token=request.token,
+                title=new_repo_name,
+                description=request.repo_description,
+                github_repo_link=result['repo_url']
+            )
+            create_project(user_project)  # Pass the UserProject instance directly
             return result['repo_url']
         else:
             raise HTTPException(status_code=400, detail=result.get('message', 'Unknown error'))
@@ -324,14 +333,39 @@ def create_github_repo(repo_name, description, private, token):
         else:
             return {"success": False, "status_code": response.status_code, "message": error_info.get('message', 'Unknown error')}
 
-def get_github_username(pat):
-    """Fetch the GitHub username associated with the personal access token."""
-    headers = {'Authorization': f'token {pat}'}
-    response = requests.get('https://api.github.com/user', headers=headers)
-    if response.status_code == 200:
-        return response.json()['login']
-    print(f"Failed to fetch user info: {response.status_code} - {response.text}")
-    return None
+@app.get("/get-github-username")
+def get_github_username(token: Optional[str] = Header(None, description="GitHub Personal Access Token")):
+    """
+    Fetch the GitHub username associated with the provided personal access token.
+    
+    Args:
+        token: GitHub Personal Access Token passed as a header
+        
+    Returns:
+        JSON with the GitHub username
+        
+    Raises:
+        401: If no token is provided
+        403: If the token is invalid
+        500: For other errors
+    """
+    if not token:
+        raise HTTPException(status_code=401, detail="GitHub token is required")
+    try:
+        headers = {'Authorization': f'token {token}'}
+        response = requests.get('https://api.github.com/user', headers=headers)
+        if response.status_code == 200:
+            return {"username": response.json()['login']}
+        elif response.status_code == 401:
+            raise HTTPException(status_code=403, detail="Invalid or expired GitHub token")
+        else:
+            raise HTTPException(
+                status_code=response.status_code, 
+                detail=f"GitHub API error: {response.text}"
+            )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch GitHub username: {str(e)}")
+
 
 def process_due_date(due_date):
     """Convert a due date to ISO 8601 format for GitHub API."""
