@@ -1,0 +1,18 @@
+{
+    "name": "github-server",
+    "version": "1.0.0",
+    "scripts": {
+        "start-github": "node backend/githubServer.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "body-parse": "^0.1.0",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2",
+        "node-fetch": "^3.3.2"
+    }
+}
