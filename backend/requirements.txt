@@ -1,0 +1,7 @@
+python-dotenv
+fastapi
+fastapi-cli
+uvicorn
+pymongo
+openai
+pydantic
