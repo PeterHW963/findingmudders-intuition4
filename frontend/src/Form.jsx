@@ -57,6 +57,7 @@ function Success({ confirmationResponse }) {
         style={{
           height: "60vh",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center", // This centers vertically in the container
           justifyContent: "center", // This centers horizontally
           textAlign: "center",
@@ -69,8 +70,23 @@ function Success({ confirmationResponse }) {
         >
           Success! Project created 🥳
         </h1>
-        <h2>
-          <a href={github_repo_link} target="_blank" rel="noopener noreferrer">
+        <h2
+          style={{
+            fontFamily: "Roboto, Arial, sans-serif",
+            marginTop: "5px",
+            fontSize: "18px",
+          }}
+        >
+          <span>Your github repository is: </span>
+          <a
+            href={github_repo_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontWeight: "normal", // Adjusts font weight
+              color: "#7BA6B4", // Sets color to black (or choose another color)
+            }}
+          >
             {github_repo_link}
           </a>
         </h2>
