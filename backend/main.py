@@ -407,7 +407,8 @@ def create_milestone(repo_owner, repo_name, token, milestone_data):
 
 def create_issue(repo_owner, repo_name, token, issue_data, milestone_number):
     """Create an issue in the specified GitHub repository under a milestone."""
-    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues"
+    processed_repo_owner = repo_owner['username']
+    url = f"https://api.github.com/repos/{processed_repo_owner}/{repo_name}/issues"
     headers = {
         "Authorization": f"token {token}",
         "Content-Type": "application/json",
