@@ -46,4 +46,4 @@ def create_github_repo(repo_name, description, private, token):
             }
 
 
-print(create_github_repo("gay", "more gay", True, "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"))
+print(create_github_repo("gay", "more gay2", True, "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"))
