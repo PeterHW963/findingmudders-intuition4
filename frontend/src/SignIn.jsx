@@ -18,9 +18,13 @@ export default function SignIn() {
 
     if (codeParam && localStorage.getItem("accessToken") === null) {
       async function getAccessToken() {
-        await fetch("http://localhost:4000/getAccessToken?code=" + codeParam, {
-          method: "GET",
-        })
+        await fetch(
+          "https://ricoai1-526454760b6c.herokuapp.com/getAccessToken?code=" +
+            codeParam,
+          {
+            method: "GET",
+          }
+        )
           .then((response) => {
             return response.json();
           })
@@ -39,7 +43,7 @@ export default function SignIn() {
   }, []);
 
   async function getUserData() {
-    await fetch("http://localhost:4000/getUserData", {
+    await fetch("https://ricoai1-526454760b6c.herokuapp.com/getUserData", {
       method: "GET",
       headers: {
         Authorization: "Bearer " + localStorage.getItem("accessToken"), //bearer access token
