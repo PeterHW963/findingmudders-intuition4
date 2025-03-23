@@ -384,6 +384,7 @@ def process_due_date(due_date):
 def create_milestone(repo_owner, repo_name, token, milestone_data):
     """Create a milestone in the specified GitHub repository."""
     url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/milestones"
+    print(url)
     headers = {
         "Authorization": f"token {token}",
         "Content-Type": "application/json",
